@@ -1,0 +1,22 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  style-guide-checker-test:
+    runs-on: ubuntu-latest
+    name: A test job to run Style Guide Checker
+    steps:
+      - name: Run Style Guide Checker on changed files
+        uses: ./ # Uses an action in the root directory
+        id: style-guide-checker-test
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          openai-token: ${{ secrets.OPENAI_API_KEY }}
+          all_files: true
+          ignore_path: '**/node_modules/**'
+          file_extensions: |
+            **/*.{md,MD,html,HTML}

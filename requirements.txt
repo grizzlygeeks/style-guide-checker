@@ -1,0 +1,13 @@
+langchain
+langchain_experimental
+langchain_openai
+langchain-community
+beautifulsoup4
+python-dotenv
+pydantic>=2.0.0
+bs4
+markdown
+feedparser 
+langchainhub
+openai
+unstructured
