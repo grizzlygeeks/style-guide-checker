@@ -45,6 +45,8 @@ jobs:
       - name: Run Style Guide Checker on changed files
         uses: ./ # Uses an action in the root directory
         id: style-guide-checker-test-bad
+        env:
+          EXPECTED_EXIT_CODE: 1
         with:
           openai_token: ${{ secrets.OPENAI_API_KEY }}
           all_files: true

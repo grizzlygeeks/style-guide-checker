@@ -71,4 +71,10 @@ for k,v in output.items():
     if 'VIOLATIONS FOUND' in v:
         exit_code = 1
 
+if os.getenv('EXPECTED_EXIT_CODE') is not None:
+    expected_exit_code = int(os.getenv('EXPECTED_EXIT_CODE'))
+    if expected_exit_code != exit_code:
+        print(f'Expected exit code {expected_exit_code}, got {exit_code}')
+        exit(1)
+    exit(0)
 exit(exit_code)
