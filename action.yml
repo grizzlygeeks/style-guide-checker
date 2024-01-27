@@ -2,7 +2,11 @@ name: Style Guide Checker
 description: Runs a Style Guide Checker on changed files
 author: jeefy
 inputs:
-  openai-token:
+  override_files:
+    description: "Override the files to run Style Guide Checker on."
+    required: false
+    default: ''
+  openai_token:
     description: "[OPENAI\_API\_KEY](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)"
     required: true
   all_files:
@@ -10,7 +14,7 @@ inputs:
     required: false
     default: false
   ignore_path:
-    description: "GLOB defining files to ignore (e.g. **/node_modules/**"
+    description: "GLOB defining files to ignore (e.g. **/node_modules/**)"
     required: false
     default: ''
   file_extensions:
@@ -20,7 +24,7 @@ inputs:
       **/*.{md,MD,html,HTML}
   style_guide:
     description: "Style Guide to use."
-    required: false
+    required: true
     default: 'https://kubernetes.io/docs/contribute/style/style-guide/'
 
 runs:
@@ -32,17 +36,17 @@ runs:
       with:
         path: ${{ inputs.path }}
         files: ${{ inputs.file_extensions }}
-        files_ignore_from_source_file: ${{ inputs.ignore_path }}
         diff_relative: true
         files_separator: '|||'
+        files_ignore_from_source_file: ''
     - name: Run Style Guide Checker on changed files
       id: style-guide-checker
-      using: 'docker'
-      image: 'Dockerfile'
+      shell: bash
+      run: |
+        python3 -m pip install --upgrade -r requirements.txt
+        python3 run.py
       env:
         ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        GITHUB_SERVER_URL: ${{ github.server_url }}
-        GITHUB_REPOSITORY: ${{ github.repository }}
-        GITHUB_BASE_REF: ${{ github.base_ref }}
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
-        GITHUB_SHA: ${{ github.sha }}
+        OVERRIDE_FILES: ${{ inputs.override_files }}
+        OPENAI_API_KEY: ${{ inputs.openai_token }}
+        STYLE_GUIDE: ${{ inputs.style_guide }}

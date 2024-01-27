@@ -17,7 +17,9 @@ prompt_template = """Given the following style guide: {style_guide_url}
 
 Find violations of the style guide. Even if a page is not part of the style guide's project, look for violations of the style guide and list them out in detail.
 
-If there are no violations for a page, write "NONE"
+If the document does not adhere to the style guide, write "VIOLATIONS FOUND" at the end of your response. Otherwise, write "VALID DOCUMENT" at the end of your response.
+
+If the document is blank, write only write "BLANK DOCUMENT" at the end of your response.
 
 FILE: 
 "{file}"
@@ -26,12 +28,26 @@ VIOLATIONS:"""
 prompt = PromptTemplate.from_template(prompt_template)
 # We want to run an individual LLM query on each file for cleanliness and to avoid hitting a token limit
 # This could be optimized in the future
-for f in os.getenv('FILES').split('|||'):
+override_files = os.getenv('OVERRIDE_FILES')
+if override_files is not None:
+    changed_files = override_files
+else:
+    changed_files = os.getenv('FILES')
+
+if changed_files is None or changed_files == '':
+    print('No files to process')
+    exit(0)
+
+output = {}
+
+for f in changed_files.split('|||'):
+    f = f.strip()
     if os.path.isfile(f):
         loader = UnstructuredFileLoader(f)
         docs = loader.load()
     else:
-        print(f'Invalid file: {f}')
+        print(f'Invalid file: `{f}`')
+        continue
 
     # Define LLM chain
     llm = ChatOpenAI(temperature=0, model_name="gpt-4-turbo-preview")
@@ -42,6 +58,17 @@ for f in os.getenv('FILES').split('|||'):
                                     document_variable_name="file")
     
     results = stuff_chain.invoke({'input_documents': docs,
-                                  'style_guide_url': os.getenv('STYLE_GUIDE_URL')})
+                                  'style_guide_url': os.getenv('STYLE_GUIDE')})
 
-    pprint.pprint(results)
+    output[f] = results['output_text']
+
+exit_code = 0
+for k,v in output.items():
+    print(f'FILE: {k}')
+    print(v)
+    print('\n\n')
+
+    if 'VIOLATIONS FOUND' in v:
+        exit_code = 1
+
+exit(exit_code)

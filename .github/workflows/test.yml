@@ -8,15 +8,47 @@ on:
 jobs:
   style-guide-checker-test:
     runs-on: ubuntu-latest
-    name: A test job to run Style Guide Checker
+    name: Run the Style Guide Checker on ourselves
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - name: Run Style Guide Checker on changed files
         uses: ./ # Uses an action in the root directory
         id: style-guide-checker-test
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          openai-token: ${{ secrets.OPENAI_API_KEY }}
+          openai_token: ${{ secrets.OPENAI_API_KEY }}
           all_files: true
-          ignore_path: '**/node_modules/**'
           file_extensions: |
             **/*.{md,MD,html,HTML}
+  style-guide-checker-test-good:
+    runs-on: ubuntu-latest
+    name: Success test job to force a run Style Guide Checker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Style Guide Checker on changed files
+        uses: ./ # Uses an action in the root directory
+        id: style-guide-checker-test-good
+        with:
+          openai_token: ${{ secrets.OPENAI_API_KEY }}
+          all_files: true
+          file_extensions: |
+            **/*.{md,MD,html,HTML}
+          override_files: |
+            test/good.md
+  style-guide-checker-test-bad:
+    runs-on: ubuntu-latest
+    name: Failure test job to force a run Style Guide Checker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Style Guide Checker on changed files
+        uses: ./ # Uses an action in the root directory
+        id: style-guide-checker-test-bad
+        with:
+          openai_token: ${{ secrets.OPENAI_API_KEY }}
+          all_files: true
+          file_extensions: |
+            **/*.{md,MD,html,HTML}
+          override_files: |
+            test/bad.md
