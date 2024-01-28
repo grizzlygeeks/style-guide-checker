@@ -1,7 +1,9 @@
 # Style Guide Checker GitHub Action
 
 ## Introduction
-The Style Guide Checker GitHub Action is designed to automatically review your docs to ensure it adheres to specified style guidelines. It currently uses OpenAI's GPT-4 Preview model, and therefore requires a valid OpenAI API Key.
+The Style Guide Checker GitHub Action is designed to automatically review your PRs to ensure they adhere to specified style guidelines. It currently uses OpenAI's GPT-4 Preview model, and therefore requires a valid OpenAI API Key.
+
+This can be used to both check code PRs or Docs PRs against a (relevant and appropriate) style guide. 
 
 ## Getting Started
 
